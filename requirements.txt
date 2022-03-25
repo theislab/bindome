@@ -1,0 +1,10 @@
+pandas
+numba
+seaborn
+matplotlib
+mygene
+h5py
+sqlalchemy
+pybedtools
+scikit-learn
+statsmodels
