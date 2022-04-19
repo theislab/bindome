@@ -1,2 +1,3 @@
 import bindome.datasets
 import bindome.constants
+from bindome.constants import set_anndata_directory

@@ -11,15 +11,14 @@ def get_parent_path(p):
 class REMAP2020:
     
     @staticmethod
-    def get_remap_peaks(tf, genome='hg19', check=True, summit_extend=100, remove_non_canonical_chromosomes=True,
-                        basedir=None):
+    def get_remap_peaks(tf, genome='hg19', check=True, summit_extend=100, remove_non_canonical_chromosomes=True):
         
         if genome != 'hg19':
             assert genome == 'hg19'
         else:
             p = None
             if tf is not None:
-                p = REMAP2020.get_remap_peaks_path(tf, basedir=basedir if basedir is not None else bd.constants.ANNOTATIONS_DIRECTORY)
+                p = REMAP2020.get_remap_peaks_path(tf)
             else:
                 p = '/g/scb2/zaugg/rio/data/remap2/ReMap2_nrPeaks_hg19.bed.gz'
             if p is None:
@@ -191,17 +190,16 @@ class REMAP2020:
                                   if tf.endswith('.bed.gz')]
 
     @staticmethod
-    def get_remap_peaks_path(tf_name, basedir=None):
+    def get_remap_peaks_path(tf_name):
         #tf_id = tf_name.lower()
         
-        if basedir is None:
-            basedir = join(bd.constants.ANNOTATIONS_DIRECTORY, 'remap/remap3/nrPeaks')
+        basedir = join(bd.constants.ANNOTATIONS_DIRECTORY, 'remap/remap3/nrPeaks')
             
         if not exists(basedir):
             print('please include this data directory to run loading of peaks successfully')
             # print(exists(basedir), basedir)
             assert not exists(basedir)
-            
+        
         if 'remap3' in basedir:
             p = join(basedir, tf_name + ".bed.gz")
         if 'remap2' in basedir:
