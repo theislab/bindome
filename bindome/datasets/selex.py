@@ -7,37 +7,45 @@ import os
 class SELEX():
     
     @staticmethod
-    def get_data():
+    def get_data(accession='PRJEB3289'):
         selex_dir = bd.constants.ANNOTATIONS_DIRECTORY + '/selex'
         os.path.exists(selex_dir)    
         
-        filenames = [f for f in os.listdir(os.path.join(selex_dir, 'PRJEB3289'))]
+        filenames = [f for f in os.listdir(os.path.join(selex_dir, accession))]
         tfs = set([f.split('_')[0].upper() for f in filenames])
-        len(tfs)
+        # len(tfs)
 
+        print('# filenames', len(filenames))
         data = pd.DataFrame(filenames, columns=['filename'])
-        data['library'] = data['filename'].str.split('_').str[1]
-        data['batch'] = data['filename'].str.split('_').str[2]
-        data['cycle'] = data['filename'].str.split('_').str[3].str.replace('.fastq.gz', '') # .astype(int)
+        data['library'] = data['filename'].str.split('_').str[1 if accession == 'PRJEB3289' else 2]
+        data['batch'] = data['filename'].str.split('_').str[2 if accession == 'PRJEB3289' else 1]
+        data['cycle'] = data['filename'].str.split('_').str[3].str.split('.').str[0] # .astype(int)
         data['tf.name'] = [f.split('_')[0].upper() for f in filenames]
         # data.head()
         return data
 
     @staticmethod
-    def load_read_counts(tf_name, data=None, library=None):
+    def load_read_counts(tf_name, data=None, library=None, accession='PRJEB3289'):
         if data is None:
-            data = SELEX.get_data()
+            data = SELEX.get_data(accession=accession)
 
+        # print(data.shape)
+        # print(data.head())
+        # print(data[data['tf.name'].str.contains(tf_name)])
         selex_dir = bd.constants.ANNOTATIONS_DIRECTORY + '/selex'
         df_by_filename = {}
-        for ri, r in data[data['tf.name'].str.contains(tf_name)].iterrows():
+        
+        data_sel = data[data['tf.name'].str.contains(tf_name)]
+        # print(data_sel.shape)
+        for ri, r in data_sel.iterrows():
             
+            # print(r['library'])
             if library is not None and r['library'] != library:
                 continue
             
-            k = r['filename'].replace('.fastq.gz', '')
-            print(r['filename'], end='')
-            p = os.path.join(selex_dir, 'PRJEB3289', r['filename'])
+            k = r['filename'].replace('.fastq.gz', '').replace('.txt.gz', '')
+            # print(r['filename'], end='')
+            p = os.path.join(selex_dir, accession, r['filename'])
 
             i = 0
             reads = []
