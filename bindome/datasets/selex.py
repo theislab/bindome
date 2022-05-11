@@ -3,26 +3,39 @@ import bindome as bd
 import pandas as pd
 import gzip
 import os
+import numpy as np
 
 class SELEX():
     
     @staticmethod
-    def get_data(accession='PRJEB3289'):
+    def get_data(accession=None):
         selex_dir = bd.constants.ANNOTATIONS_DIRECTORY + '/selex'
-        os.path.exists(selex_dir)    
-        
-        filenames = [f for f in os.listdir(os.path.join(selex_dir, accession))]
-        tfs = set([f.split('_')[0].upper() for f in filenames])
-        # len(tfs)
-
-        print('# filenames', len(filenames))
-        data = pd.DataFrame(filenames, columns=['filename'])
-        data['library'] = data['filename'].str.split('_').str[1 if accession == 'PRJEB3289' else 2]
-        data['batch'] = data['filename'].str.split('_').str[2 if accession == 'PRJEB3289' else 1]
-        data['cycle'] = data['filename'].str.split('_').str[3].str.split('.').str[0] # .astype(int)
-        data['tf.name'] = [f.split('_')[0].upper() for f in filenames]
+        os.path.exists(selex_dir)            
+        filenames = []
+        tfs = set()
+        data_df = []
+        for accession_id in os.listdir(selex_dir):
+            print(accession_id)
+            filenames = [f for f in os.listdir(os.path.join(selex_dir, accession_id))]
+            tfs = set([f.split('_')[0].upper() for f in filenames]).union(tfs)
+            # len(tfs)
+            print('# filenames', len(filenames))
+            data = pd.DataFrame(filenames, columns=['filename'])
+            
+            opt_library = 1 if accession_id == 'PRJEB3289' else (-1 if accession_id == 'PRJEB9797' else -2 if accession_id == 'PRJEB14744' else 2)
+            data['library'] = data['filename'].str.split('.').str[0].str.split('_').str[opt_library]
+            opt_batch = 2 if accession_id == 'PRJEB3289' else (1 if accession_id == 'PRJEB9797' else 1 if accession_id == 'PRJEB14744' else 2)
+            data['batch'] = data['filename'].str.split('.').str[0].str.split('_').str[opt_batch]
+            opt_cycle = -1 if accession_id == 'PRJEB3289' else (2 if accession_id == 'PRJEB9797' else 1 if accession_id == 'PRJEB14744' else 2)
+            data['cycle'] = np.where(data['filename'].str.contains('Zero'), 0,
+                                     data['filename'].str.split('.').str[0].str.split('_').str[opt_cycle])
+            data['tf.name'] = [f.split('_')[0].upper() for f in filenames]
+            data['accession'] = accession_id
+            data_df.append(data)
         # data.head()
-        return data
+        return pd.concat(data_df).reset_index(drop=True)
+    
+    
 
     @staticmethod
     def load_read_counts(tf_name, data=None, library=None, accession='PRJEB3289'):
