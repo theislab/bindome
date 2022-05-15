@@ -38,9 +38,9 @@ class SELEX():
     
 
     @staticmethod
-    def load_read_counts(tf_name, data=None, library=None, accession='PRJEB3289'):
+    def load_read_counts(tf_name=None, data=None, library=None):
         if data is None:
-            data = SELEX.get_data(accession=accession)
+            data = SELEX.get_data()
 
         # print(data.shape)
         # print(data.head())
@@ -48,7 +48,8 @@ class SELEX():
         selex_dir = bd.constants.ANNOTATIONS_DIRECTORY + '/selex'
         df_by_filename = {}
         
-        data_sel = data[data['tf.name'].str.contains(tf_name)]
+        data_sel = data[data['tf.name'].str.contains(tf_name)] if tf_name is not None else data
+        
         # print(data_sel.shape)
         for ri, r in data_sel.iterrows():
             
@@ -58,7 +59,7 @@ class SELEX():
             
             k = r['filename'].replace('.fastq.gz', '').replace('.txt.gz', '')
             # print(r['filename'], end='')
-            p = os.path.join(selex_dir, accession, r['filename'])
+            p = os.path.join(selex_dir, r['accession'], r['filename'])
 
             i = 0
             reads = []
