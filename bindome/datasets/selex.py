@@ -88,14 +88,19 @@ class SELEX():
                 df = pd.read_csv(p)
                 df.columns = ['seq']
 
+            # force most frequent sequence is considered
+            top_seqlen = df.seq.str.len().value_counts().sort_values().index[-1]
+            # print(df.seq.str.len().value_counts().sort_values().index[-1])
+            df = df[df['seq'].str.len() == top_seqlen]
+
             df = df.seq.value_counts().reset_index()
             df.columns = ['seq', 'counts']
-            print('# uniq reads/total counts %i/%i' % (df.shape[0], df['counts'].sum()))
+            # print('# uniq reads/total counts %i/%i' % (df.shape[0], df['counts'].sum()))
             # df[df['tf.name'].str.contains('GATA')]
 
-            print(p, os.path.exists(p))
+            # print(p, os.path.exists(p))
             uniq_seqlen = set(df['seq'].str.len())
-            print(uniq_seqlen)
+            # print(uniq_seqlen)
             var_len_input = len(uniq_seqlen) != 1
             if var_len_input:
                 for seqlen in uniq_seqlen:
