@@ -16,6 +16,8 @@ class SELEX():
         data_df = []
         for accession_id in os.listdir(selex_dir):
             print(accession_id)
+            if accession is not None and accession_id != accession:
+                continue
             filenames = [f for f in os.listdir(os.path.join(selex_dir, accession_id))]
             tfs = set([f.split('_')[0].upper() for f in filenames]).union(tfs)
             # len(tfs)
@@ -38,7 +40,7 @@ class SELEX():
     
 
     @staticmethod
-    def load_read_counts(tf_name=None, data=None, library=None):
+    def load_read_counts(tf_name=None, data=None, library=None, fastq=True, k_skip=None):
         if data is None:
             data = SELEX.get_data()
 
@@ -58,21 +60,48 @@ class SELEX():
                 continue
             
             k = r['filename'].replace('.fastq.gz', '').replace('.txt.gz', '')
+            
+            if k_skip is not None and k in k_skip:
+                df_by_filename[k] = None
+                continue
+            
             # print(r['filename'], end='')
             p = os.path.join(selex_dir, r['accession'], r['filename'])
 
             i = 0
+            seqlen = set()
             reads = []
-            for r in gzip.open(p):
-                if (i + 3) % 4 == 0:
-                    # print(r)
-                    reads.append(r.strip().decode("utf-8"))
-                i += 1
-            df = pd.DataFrame(reads, columns=['seq'])
+            if fastq:
+                for r in gzip.open(p):
+                    if (i + 3) % 4 == 0:
+                        # print(r)
+                        s = r.strip().decode("utf-8")
+                        if len(seqlen) == 0:
+                            seqlen.add(len(s))
+                        else:
+                            if len(s) not in seqlen:
+                                print(i, seqlen, len(s), s)
+                        reads.append(s)
+                    i += 1
+                df = pd.DataFrame(reads, columns=['seq'])
+            else:
+                df = pd.read_csv(p)
+                df.columns = ['seq']
+
             df = df.seq.value_counts().reset_index()
             df.columns = ['seq', 'counts']
             print('# uniq reads/total counts %i/%i' % (df.shape[0], df['counts'].sum()))
             # df[df['tf.name'].str.contains('GATA')]
+
+            print(p, os.path.exists(p))
+            uniq_seqlen = set(df['seq'].str.len())
+            print(uniq_seqlen)
+            var_len_input = len(uniq_seqlen) != 1
+            if var_len_input:
+                for seqlen in uniq_seqlen:
+                    print(seqlen)
+                    print(df[df['seq'].str.len() == seqlen].head(1))
+                assert var_len_input
 
             df_by_filename[k] = df
             # break
