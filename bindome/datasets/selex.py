@@ -36,7 +36,21 @@ class SELEX():
             data_df.append(data)
         # data.head()
         return pd.concat(data_df).reset_index(drop=True)
-    
+
+    @staticmethod
+    def load_tf_and_zero_reads(tf, data, **kwargs):
+        data_sel_tf = data[(data['tf.name'] == tf)]  # & (grp['cycle'].astype(str) == '1')]
+        data_sel_zero = data[(data['cycle'] == 0) & data['library'].isin(set(data[data['tf.name'] == tf][
+                                                                              'library']))]  # & grp['accession'].isin(set(grp[grp['tf.name'] == tf]['accession']))]
+
+        print(data_sel_tf.shape[0], data_sel_zero.shape[0])
+        if data_sel_tf.shape[0] == 0 or data_sel_zero.shape[0] == 0:
+            assert False
+        # print('loading', tf, ':', library)
+        reads_tf_next = SELEX.load_read_counts(tf, data=data_sel_tf, **kwargs)
+        reads_zero_next = SELEX.load_read_counts(data=data_sel_zero, **kwargs)
+
+        return reads_tf_next, reads_zero_next
     
 
     @staticmethod
