@@ -54,7 +54,7 @@ class SELEX():
     
 
     @staticmethod
-    def load_read_counts(tf_name=None, data=None, library=None, fastq=True, k_skip=None, log_each=-1, stop_at=-1):
+    def load_read_counts(tf_name=None, data=None, library=None, is_fastq=None, k_skip=None, log_each=-1, stop_at=-1):
         if data is None:
             data = SELEX.get_data()
 
@@ -79,7 +79,8 @@ class SELEX():
             # print(r['library'])
             if library is not None and r['library'] != library:
                 continue
-            
+
+            is_fastq = 'fastq' in r['filename']
             k = r['filename'].replace('.fastq.gz', '').replace('.txt.gz', '')
             
             if k_skip is not None and k in k_skip:
@@ -92,7 +93,7 @@ class SELEX():
             i = 0
             seqlen = set()
             reads = []
-            if fastq:
+            if is_fastq:
                 for r in gzip.open(p):
                     if (i + 3) % 4 == 0:
                         # print(r)
