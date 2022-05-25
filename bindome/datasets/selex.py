@@ -54,7 +54,7 @@ class SELEX():
     
 
     @staticmethod
-    def load_read_counts(tf_name=None, data=None, library=None, fastq=True, k_skip=None):
+    def load_read_counts(tf_name=None, data=None, library=None, fastq=True, k_skip=None, log_each=-1, stop_at=-1):
         if data is None:
             data = SELEX.get_data()
 
@@ -66,9 +66,16 @@ class SELEX():
         
         data_sel = data[data['tf.name'].str.contains(tf_name)] if tf_name is not None else data
         
-        # print(data_sel.shape)
+        print('datasets to attempt loading', data_sel.shape)
+        counter = 0
         for ri, r in data_sel.iterrows():
-            
+
+            counter += 1
+            if counter % log_each == 0:
+                print(counter, 'out of', data_sel.shape)
+            if counter == stop_at:
+                break
+
             # print(r['library'])
             if library is not None and r['library'] != library:
                 continue
@@ -121,6 +128,7 @@ class SELEX():
                     print(seqlen)
                     print(df[df['seq'].str.len() == seqlen].head(1))
                 assert var_len_input
+
 
             df_by_filename[k] = df
             # break
