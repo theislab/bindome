@@ -26,6 +26,30 @@ class SELEX():
             
             opt_library = 1 if accession_id == 'PRJEB3289' else (-1 if accession_id == 'PRJEB9797' else -2 if accession_id == 'PRJEB14744' else 2)
             data['library'] = data['filename'].str.split('.').str[0].str.split('_').str[opt_library]
+            library = []
+            opt = {'%iN' % i for i in range(10, 45, 5)}
+            print(data.shape)
+            for i, f in enumerate(list(data['filename'])):
+                s = f.split('.')[0].split('_')
+                found = 0
+                for si in s:
+                    for opt_i in opt:
+                        if opt_i in si:
+                            # print('found...')
+                            library.append(si)
+                            found = 1
+                            break
+                    if found:
+                        break
+                if not found:
+                    # print(f, s)
+                    library.append(list(data['library'])[i])
+
+            # print('here...')
+            # print(len(library), data.shape[0])
+            assert len(library) == data.shape[0]
+            data['library'] = library
+
             opt_batch = 2 if accession_id == 'PRJEB3289' else (1 if accession_id == 'PRJEB9797' else 1 if accession_id == 'PRJEB14744' else 2)
             data['batch'] = data['filename'].str.split('.').str[0].str.split('_').str[opt_batch]
             opt_cycle = -1 if accession_id == 'PRJEB3289' else (2 if accession_id == 'PRJEB9797' else 1 if accession_id == 'PRJEB14744' else 2)
