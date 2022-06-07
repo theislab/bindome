@@ -33,5 +33,5 @@ class ProBound():
         df = pd.read_csv(os.path.join(probound_dir, 'countTable.0.CTCF_r3.tsv.gz'),
                         sep='\t', header=None)
         df.columns = ['seq', 0, 1]
-        df['seq'] = left_flank[-flankLength:] + df['seq'] + right_flank[:flankLength]
+        df['seq'] = left_flank[-flank_length:] + df['seq'] + right_flank[:flank_length]
         return df
