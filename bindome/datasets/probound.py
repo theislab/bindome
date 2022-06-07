@@ -27,10 +27,11 @@ class ProBound():
 
     @staticmethod
     def ctcf(left_flank='ACACTCTTTCCCTACACGACGCTCTTCCGATCTTGACGTC',
-             right_flank='GACGTCAGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG'):
+             right_flank='GACGTCAGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG',
+             flank_length=7):
         probound_dir = bd.constants.ANNOTATIONS_DIRECTORY + '/chipseq/probound'
         df = pd.read_csv(os.path.join(probound_dir, 'countTable.0.CTCF_r3.tsv.gz'),
                         sep='\t', header=None)
         df.columns = ['seq', 0, 1]
-        df['seq'] = left_flank + df['seq'] + right_flank
+        df['seq'] = left_flank[-flankLength:] + df['seq'] + right_flank[:flankLength]
         return df
