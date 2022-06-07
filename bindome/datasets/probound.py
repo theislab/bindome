@@ -23,3 +23,14 @@ class ProBound():
             df['batch'] = conc
             df2.append(df)
         return pd.concat(df2)
+
+
+    @staticmethod
+    def ctcf(left_flank='ACACTCTTTCCCTACACGACGCTCTTCCGATCTTGACGTC',
+             right_flank='GACGTCAGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG'):
+        probound_dir = bd.constants.ANNOTATIONS_DIRECTORY + '/chipseq/probound'
+        df = pd.read_csv(os.path.join(probound_dir, 'countTable.0.CTCF_r3.tsv.gz'),
+                        sep='\t', header=None)
+        df.columns = ['seq', 0, 1]
+        df['seq'] = left_flank + df['seq'] + right_flank
+        return df
