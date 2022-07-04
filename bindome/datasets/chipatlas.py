@@ -1,17 +1,17 @@
-'''
-@author: ignacio
-'''
+import os
+import pandas as pd
+import bindome as bd
 
 class ChIPAtlas:
 
     @staticmethod
     def get_db_path(**kwargs):
-        return '../../data/chip-atlas' if kwargs.get('dbpath') is None else kwargs.get('dbpath')
+        return os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, 'chipseq/chipatlas') if kwargs.get('dbpath') is None else kwargs.get('dbpath')
 
     @staticmethod
     def get_experiments_list(update_columns=False, dbpath=None, **kwargs):
 
-        p = join(ChIPAtlas.get_db_path(dbpath=dbpath), 'experimentList.tab.gz')
+        p = os.path.join(ChIPAtlas.get_db_path(dbpath=dbpath), 'experimentList.tab.gz')
         if update_columns:
             print('update colummns=True. Please check whether this is necessary before removing flag.')
             # check longest line to add columns
@@ -23,33 +23,34 @@ class ChIPAtlas:
                 writer.write(line)
             writer.close()
 
-        df = DataFrameAnalyzer.read_tsv_gz(p, **kwargs)
+        df = pd.read_csv(p, sep='\t')
         schema = ChIPAtlas.get_experiments_list_schema(dbpath=dbpath)
         df.columns =  list(schema['Description'][:9]) + ['metadata.%i' % i for i in range(1, df.shape[1] - 9 + 1)]
         return df
 
     @staticmethod
     def get_experiments_list_schema(dbpath=None):
-        return DataFrameAnalyzer.read_tsv(join(ChIPAtlas.get_db_path(dbpath=dbpath),
-                                               'experimentList_schema.tab'))
+        path = os.path.join(ChIPAtlas.get_db_path(dbpath=dbpath), 'experimentList_schema.tab')
+        print('reading', path)
+        return pd.read_csv(path, sep='\t')
 
     @staticmethod
     def get_target_genes_local(genome, tf_name, distance_kbp=1, output_dir=None, download=True):
         http_path = 'http://dbarchive.biosciencedbc.jp/kyushu-u/%s/target/%s.%i.tsv' % (
         genome, tf_name, distance_kbp)
         if output_dir is None:
-            output_dir = '../../data/chip-atlas/target'
+            output_dir = os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, 'chipseq/chipatlas/target')
 
-        if not exists(output_dir):
-            print(exists(output_dir), output_dir)
+        if not os.path.exists(output_dir):
+            print(os.path.exists(output_dir), output_dir)
             print('please setup output dir')
             return
-        output_dir = join(output_dir, genome)
-        if not exists(output_dir):
-            mkdir(output_dir)
-        output_path = join(output_dir, basename(http_path))
-        print(exists(output_path), output_path)
-        if not exists(output_path) and download:
+        output_dir = os.path.join(output_dir, genome)
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+        output_path = os.path.join(output_dir, basename(http_path))
+        print(os.path.exists(output_path), output_path)
+        if not os.path.exists(output_path) and download:
             print('wget', http_path, output_path)
 
             system('wget ' + http_path + " -O " + output_path)
@@ -77,27 +78,32 @@ class ChIPAtlas:
             stop()
 
         bed_bkp_path = None
-        if datadir is not None:
-            datadir = join(datadir, genome)
-            if not exists(datadir):
-                mkdir(datadir)
-            bed_bkp_path = join(datadir, experiment_id + "_" + str(peaks_thr) + ".bed.gz")
-            if exists(bed_bkp_path):
-                return DataFrameAnalyzer.read_tsv_gz(bed_bkp_path)
+        datadir =  os.path.join(ChIPAtlas.get_db_path(), 'peaks', genome)
+        if not os.path.exists(datadir):
+            os.mkdir(datadir)
+        bed_bkp_path = os.path.join(datadir, experiment_id + "_" + str(peaks_thr) + ".bed.gz")
+        if os.path.exists(bed_bkp_path):
+            print('loading from saved BED', bed_bkp_path)
+            return pd.read_csv(bed_bkp_path, sep='\t', header=None)
+
         peaks_thr = str(peaks_thr).zfill(2)
         p = 'http://dbarchive.biosciencedbc.jp/kyushu-u/%s/eachData/bed%s/%s.%s.bed' % (genome, peaks_thr, experiment_id, peaks_thr)
         print('querying in ChIP-atlas (peak thr (-log10(Q)=%s)...' % peaks_thr)
-        print(p)
-        bed = DataFrameAnalyzer.read_tsv(p, header=None)
+        # print(p)
+        bed = pd.read_csv(p, sep='\t', header=None)
         if bed.shape[0] == 0:
             print('empty dataframe')
             return None
         bed.columns = ['chr', 'start', 'end', 'id', 'score', '.',
                        'fold.change', 'minus.log10.pval','minus.log10.qval','summit']
-        from lib.SequenceMethods import SequenceMethods
-        bed = SequenceMethods.parse_range2coordinate(bed, ['chr', 'start', 'end'], 'k.summit')
+
+        # print(bed.head())
+        bed['k'] = bed['chr'] + ':' + bed['start'].astype(str) + '-' + bed['end'].astype(str)
+        # from lib.SequenceMethods import SequenceMethods
+        # bed = SequenceMethods.parse_range2coordinate(bed, ['chr', 'start', 'end'], 'k.summit')
         if bed_bkp_path is not None:
-            DataFrameAnalyzer.to_tsv_gz(bed, bed_bkp_path)
+            print('saving to output...', bed_bkp_path)
+            bed.to_csv(bed_bkp_path, sep='\t')
         return bed
 
     @staticmethod
@@ -109,5 +115,5 @@ class ChIPAtlas:
         p = 'http://dbarchive.biosciencedbc.jp/kyushu-u/%s/target/%s.%i.tsv' % (genome, tf_name, distance_kbp)
         print('querying target genes in ChIP-atlas (distance thr = %iKbp)...' % distance_kbp)
         print(p)
-        df = DataFrameAnalyzer.read_tsv(p)
+        df = pd.read_csv(p, sep='\t')
         return df
