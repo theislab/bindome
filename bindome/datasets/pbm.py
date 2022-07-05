@@ -3,6 +3,7 @@ import pandas as pd
 import gzip
 import os
 import anndata
+import scipy.io
 
 class PBM():
     @staticmethod
@@ -22,3 +23,29 @@ class PBM():
             assert os.path.exists(h5ad_path)
         ad = anndata.read_h5ad(h5ad_path)
         return ad
+
+    @staticmethod
+    def pbm_homeo_affreg():
+
+        matlab_path = os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, 'pbm', 'affreg', 'PbmDataHom6_norm.mat')
+        mat = scipy.io.loadmat(matlab_path)
+
+        data = mat['PbmData'][0]
+        symbols = data[0][0][0][0][0]
+        seqs_dbd = data[0][0][0][0][1]
+        seqs_full = data[0][0][0][0][2]
+        signal = data[0][1].T
+        seqs = []
+        names = []
+        for i, s in enumerate(seqs_dbd):
+            name = symbols[i][0][0] + '_' + str(i)
+            seq = str(s[0][0])
+            seqs += [seq]
+            names.append(name)
+
+        df = pd.DataFrame()
+        df['seq'] = seqs
+        df['name'] = names
+
+        return df, signal
+
