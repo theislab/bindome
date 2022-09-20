@@ -53,9 +53,7 @@ omit = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-xfail_strict = true
 addopts = [
-    "-Werror",  # if 3rd party libs raise DeprecationWarnings, just use filterwarnings below
     "--import-mode=importlib",  # allow using test files with same name
 ]
 filterwarnings = [
