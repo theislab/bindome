@@ -1,13 +1,13 @@
 name: bindome
 channels:
- - conda-forge
- - anaconda
- - bioconda
+    - conda-forge
+    - anaconda
+    - bioconda
 dependencies:
- - python>=3.5
- - pandas
- - numpy
- - scipy
- - scikit-learn
- - jupyter
- - seaborn
+    - python>=3.5
+    - pandas
+    - numpy
+    - scipy
+    - scikit-learn
+    - jupyter
+    - seaborn

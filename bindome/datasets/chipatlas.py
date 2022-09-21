@@ -1,5 +1,7 @@
 import os
+
 import pandas as pd
+
 import bindome as bd
 import wget
 
@@ -35,8 +37,8 @@ def _get_sequencing_metadata_from_page(soup):
 
 
 def _get_sequencing_metadata(chip_atlas_id: str) -> dict:
-    from bs4 import BeautifulSoup
     import requests
+    from bs4 import BeautifulSoup
 
     url = f"https://chip-atlas.org/view?id={chip_atlas_id}"
     req = requests.get(url, "html.parser")
@@ -57,9 +59,7 @@ class ChIPAtlas:
 
         p = os.path.join(ChIPAtlas.get_db_path(dbpath=dbpath), "experimentList.tab.gz")
         if update_columns:
-            print(
-                "update colummns=True. Please check whether this is necessary before removing flag."
-            )
+            print("update colummns=True. Please check whether this is necessary before removing flag.")
             # check longest line to add columns
             longest_line = [len(s.split("\t")) for s in open(p)]
             headers = list(range(1, max(longest_line) + 1))
@@ -71,16 +71,12 @@ class ChIPAtlas:
 
         df = pd.read_csv(p, sep="\t")
         schema = ChIPAtlas.get_experiments_list_schema(dbpath=dbpath)
-        df.columns = list(schema["Description"][:9]) + [
-            "metadata.%i" % i for i in range(1, df.shape[1] - 9 + 1)
-        ]
+        df.columns = list(schema["Description"][:9]) + ["metadata.%i" % i for i in range(1, df.shape[1] - 9 + 1)]
         return df
 
     @staticmethod
     def get_experiments_list_schema(dbpath=None):
-        path = os.path.join(
-            ChIPAtlas.get_db_path(dbpath=dbpath), "experimentList_schema.tab"
-        )
+        path = os.path.join(ChIPAtlas.get_db_path(dbpath=dbpath), "experimentList_schema.tab")
         print("reading", path)
         return pd.read_csv(path, sep="\t")
 
@@ -89,26 +85,20 @@ class ChIPAtlas:
         metadata = _get_sequencing_metadata(exp_id)[genome_version]
         n_reads = metadata["Number of total reads"]
         pct_aligned = metadata["Reads aligned (%)"]
-        pct_dupes_removed = metadata["Duplicates removed (%)"]
+        metadata["Duplicates removed (%)"]
 
         # TODO looks way more like integers without removing dupes
-        return 1 / (
-            n_reads * (pct_aligned / 100) / 1_000_000
-        )  # * (1 - pct_dupes_removed / 100)
+        return 1 / (n_reads * (pct_aligned / 100) / 1_000_000)  # * (1 - pct_dupes_removed / 100)
 
     @staticmethod
-    def get_target_genes_local(
-        genome, tf_name, distance_kbp=1, output_dir=None, download=True
-    ):
+    def get_target_genes_local(genome, tf_name, distance_kbp=1, output_dir=None, download=True):
         http_path = "http://dbarchive.biosciencedbc.jp/kyushu-u/%s/target/%s.%i.tsv" % (
             genome,
             tf_name,
             distance_kbp,
         )
         if output_dir is None:
-            output_dir = os.path.join(
-                bd.constants.ANNOTATIONS_DIRECTORY, "chipseq/chipatlas/target"
-            )
+            output_dir = os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, "chipseq/chipatlas/target")
 
         if not os.path.exists(output_dir):
             print(os.path.exists(output_dir), output_dir)
@@ -127,7 +117,7 @@ class ChIPAtlas:
                 remove(output_path)
         try:
             return DataFrameAnalyzer.read_tsv(output_path)
-        except IOError:
+        except OSError:
             print("preblem reading file", IOError.message)
             return None
 
@@ -204,15 +194,13 @@ class ChIPAtlas:
         datadir = os.path.join(ChIPAtlas.get_db_path(), "peaks", genome)
         if not os.path.exists(datadir):
             os.mkdir(datadir)
-        bed_bkp_path = os.path.join(
-            datadir, experiment_id + "_" + str(peaks_thr) + ".bed.gz"
-        )
+        bed_bkp_path = os.path.join(datadir, experiment_id + "_" + str(peaks_thr) + ".bed.gz")
         if os.path.exists(bed_bkp_path):
             print("loading from saved BED", bed_bkp_path)
             return pd.read_csv(bed_bkp_path, sep="\t")
 
         peaks_thr = str(peaks_thr).zfill(2)
-        p = "http://dbarchive.biosciencedbc.jp/kyushu-u/%s/eachData/bed%s/%s.%s.bed" % (
+        p = "http://dbarchive.biosciencedbc.jp/kyushu-u/{}/eachData/bed{}/{}.{}.bed".format(
             genome,
             peaks_thr,
             experiment_id,
@@ -238,9 +226,7 @@ class ChIPAtlas:
         ]
 
         # print(bed.head())
-        bed["k"] = (
-            bed["chr"] + ":" + bed["start"].astype(str) + "-" + bed["end"].astype(str)
-        )
+        bed["k"] = bed["chr"] + ":" + bed["start"].astype(str) + "-" + bed["end"].astype(str)
         # from lib.SequenceMethods import SequenceMethods
         # bed = SequenceMethods.parse_range2coordinate(bed, ['chr', 'start', 'end'], 'k.summit')
         if bed_bkp_path is not None:
@@ -259,10 +245,7 @@ class ChIPAtlas:
             tf_name,
             distance_kbp,
         )
-        print(
-            "querying target genes in ChIP-atlas (distance thr = %iKbp)..."
-            % distance_kbp
-        )
+        print("querying target genes in ChIP-atlas (distance thr = %iKbp)..." % distance_kbp)
         print(p)
         df = pd.read_csv(p, sep="\t")
         return df
