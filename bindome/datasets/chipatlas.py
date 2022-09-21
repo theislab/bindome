@@ -149,20 +149,27 @@ class ChIPAtlas:
 
     @staticmethod
     def download_data(genome, experiment_id, datadir=None, peaks_thr=5, data_code='bw'):
+        """
+        generic data downloading function for retrieving URLs paths from chip_atlas into a local annotations directory
+        (BigWig and BED)
+        """
+        
+        
+        ### bed files have a thr parameter. Bw and others do not have this
         if peaks_thr not in {10, 20, 5}:
             print(peaks_thr, "not valid as a peaks_thr...")
             stop()
 
-        bed_bkp_path = None
+        bkp_path = None
         datadir = os.path.join(ChIPAtlas.get_db_path(), data_code, genome)
         if not os.path.exists(datadir):
             os.makedirs(datadir)
-        bed_bkp_path = os.path.join(
+        bkp_path = os.path.join(
             datadir, experiment_id + "_" + str(peaks_thr) + (".%s" % data_code)
         )
         
         if 'bed' in data_code:
-            bed_bkp_path + '.gz'
+            bkp_path + '.gz'
             
         # print(bed_bkp_path)
         
@@ -181,10 +188,10 @@ class ChIPAtlas:
         print("downloading from ChIP-atlas")
         print(url)
         print('output path')
-        print(bed_bkp_path)
+        print(bkp_path)
         
-        filename = wget.download(url, out=bed_bkp_path)
-        return bed_bkp_path
+        filename = wget.download(url, out=bkp_path)
+        return bkp_path
     
     
     @staticmethod
