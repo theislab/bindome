@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+
 import bindome as bd
 
 # move later
@@ -21,8 +21,9 @@ def test_remap_basic2(annpath):
 
 def test_denormalize_bigwig(tmp_path):
     # TODO: Check that sum of counts is right
-    import pandas as pd
     from textwrap import dedent
+
+    import pandas as pd
 
     path = tmp_path / "partial_SRX018625.tsv"
     with path.open("w") as f:

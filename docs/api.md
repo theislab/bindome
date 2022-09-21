@@ -24,12 +24,12 @@ peaks = mb.bindome.datasets.REMAP2020.get_remap_peaks("GATA1")
 
 Dataset examples:
 
-- ChIP-atlas
-- ReMap
-- SELEX
-- PBM
-- ProBound
-- scATAC
+-   ChIP-atlas
+-   ReMap
+-   SELEX
+-   PBM
+-   ProBound
+-   scATAC
 
 ## Tools: `tl`
 
