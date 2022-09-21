@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import bindome as bd
-
+import wget
 
 def _parse_record(element) -> dict:
     """Retrieve record info from element."""
@@ -147,6 +147,46 @@ class ChIPAtlas:
         chipatlas_by_sp = {sp: grp for sp, grp in chipatlas.groupby("species")}
         return chipatlas_by_sp
 
+    @staticmethod
+    def download_data(genome, experiment_id, datadir=None, peaks_thr=5, data_code='bw'):
+        if peaks_thr not in {10, 20, 5}:
+            print(peaks_thr, "not valid as a peaks_thr...")
+            stop()
+
+        bed_bkp_path = None
+        datadir = os.path.join(ChIPAtlas.get_db_path(), data_code, genome)
+        if not os.path.exists(datadir):
+            os.makedirs(datadir)
+        bed_bkp_path = os.path.join(
+            datadir, experiment_id + "_" + str(peaks_thr) + (".%s" % data_code)
+        )
+        
+        if 'bed' in data_code:
+            bed_bkp_path + '.gz'
+            
+        # print(bed_bkp_path)
+        
+        # only if querying bed. Ignore otherwise
+        
+        peaks_thr = str(peaks_thr).zfill(2) if data_code == 'peaks' else ''
+        
+        url = "http://dbarchive.biosciencedbc.jp/kyushu-u/%s/eachData/%s%s/%s.%s%s" % (
+            genome,
+            data_code,
+            peaks_thr,
+            experiment_id,
+            peaks_thr,
+            data_code + ('.gz' if data_code == 'bed' else '')
+        )
+        print("downloading from ChIP-atlas")
+        print(url)
+        print('output path')
+        print(bed_bkp_path)
+        
+        filename = wget.download(url, out=bed_bkp_path)
+        return bed_bkp_path
+    
+    
     @staticmethod
     def get_peaks(genome, experiment_id, datadir=None, peaks_thr=5):
         if peaks_thr not in {10, 20, 5}:
