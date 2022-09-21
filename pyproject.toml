@@ -23,7 +23,7 @@ version = "0.0.1"
 requires-python = ">=3.8"
 license = {file = "LICENSE"}
 readme = "README.md"
-dependencies = ["pandas", "anndata", "numba", "seaborn", "matplotlib", "mygene", "h5py", "sqlalchemy", "pybedtools", "scikit-learn", "statsmodels", "scanpy", "requests", "beautifulsoup4"]
+dependencies = ["pandas", "wget", "anndata", "numba", "seaborn", "matplotlib", "mygene", "h5py", "sqlalchemy", "pybedtools", "scikit-learn", "statsmodels", "scanpy", "requests", "beautifulsoup4"]
 
 [project.optional-dependencies]
 dev = [
