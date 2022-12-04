@@ -123,8 +123,6 @@ def get_sequences_from_bed(bed_path_or_dataframe, genome="hg19", **kwargs):
     if "fasta_path" in kwargs:
         del kwargs["fasta_path"]
 
-
-    print('now I am in this line')
     convert_bed_to_fasta(bed_path_or_dataframe, fasta_path, genome=genome, **kwargs)
     return get_fastas(fasta_path, **kwargs)
 
