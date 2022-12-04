@@ -71,7 +71,7 @@ class SELEX:
                 0,
                 data["filename"].str.split(".").str[0].str.split("_").str[opt_cycle],
             )
-            data["tf.name"] = [f.split("_")[0].upper() for f in filenames]
+            data["tf_name"] = [f.split("_")[0].upper() for f in filenames]
             data["accession"] = accession_id
             data_df.append(data)
         # data.head()
@@ -86,10 +86,10 @@ class SELEX:
 
     @staticmethod
     def load_tf_and_zero_reads(tf, data, **kwargs):
-        data_sel_tf = data[(data["tf.name"] == tf)]  # & (grp['cycle'].astype(str) == '1')]
+        data_sel_tf = data[(data["tf_name"] == tf)]  # & (grp['cycle'].astype(str) == '1')]
         data_sel_zero = data[
-            (data["cycle"] == 0) & data["library"].isin(set(data[data["tf.name"] == tf]["library"]))
-        ]  # & grp['accession'].isin(set(grp[grp['tf.name'] == tf]['accession']))]
+            (data["cycle"] == 0) & data["library"].isin(set(data[data["tf_name"] == tf]["library"]))
+        ]  # & grp['accession'].isin(set(grp[grp['tf_name'] == tf]['accession']))]
 
         print(data_sel_tf.shape[0], data_sel_zero.shape[0])
         if data_sel_tf.shape[0] == 0 or data_sel_zero.shape[0] == 0:
@@ -142,7 +142,7 @@ class SELEX:
         df = df.seq.value_counts().reset_index()
         df.columns = ["seq", "counts"]
         # print('# uniq reads/total counts %i/%i' % (df.shape[0], df['counts'].sum()))
-        # df[df['tf.name'].str.contains('GATA')]
+        # df[df['tf_name'].str.contains('GATA')]
 
         # print(p, os.path.exists(p))
         uniq_seqlen = set(df["seq"].str.len())
@@ -164,11 +164,11 @@ class SELEX:
 
         # print(data.shape)
         # print(data.head())
-        # print(data[data['tf.name'].str.contains(tf_name)])
+        # print(data[data['tf_name'].str.contains(tf_name)])
         selex_dir = bd.constants.ANNOTATIONS_DIRECTORY + "/selex"
         df_by_filename = {}
 
-        data_sel = data[data["tf.name"].str.contains(tf_name)] if tf_name is not None else data
+        data_sel = data[data["tf_name"].str.contains(tf_name)] if tf_name is not None else data
 
         # print('datasets to attempt loading', data_sel.shape)
         counter = 0
