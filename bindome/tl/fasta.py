@@ -8,7 +8,6 @@ from random import shuffle
 import numpy as np
 import pandas as pd
 
-
 def trim_fasta_sequence(fasta_path, bp_width, output_path):
     """
     Take a fasta file and generate a new one that has trimmed sequences
@@ -100,7 +99,6 @@ def convert_bed_to_peaks_from_summit(bed_path, bp_flanking=50, stop_at=None):
     df.to_csv(tmp_bed_path, header=False, sep="\t", index=False)
     return tmp_bed_path
 
-
 def scrambled_fasta_order(p, tmp_path=None, random_seed=None):
     fasta = get_fastas_from_file(p)
     if random_seed is not None:
@@ -124,6 +122,9 @@ def get_sequences_from_bed(bed_path_or_dataframe, genome="hg19", **kwargs):
     fasta_path = tempfile.mkstemp()[1] if kwargs.get("fasta_path") is None else kwargs.get("fasta_path")
     if "fasta_path" in kwargs:
         del kwargs["fasta_path"]
+
+
+    print('now I am in this line')
     convert_bed_to_fasta(bed_path_or_dataframe, fasta_path, genome=genome, **kwargs)
     return get_fastas(fasta_path, **kwargs)
 
