@@ -28,7 +28,6 @@ class PBM:
     @staticmethod
     def pbm_paralogs():
         pbm_data_dir = os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, 'pbm', 'GSE97794')
-        print(pbm_data_dir)
         df = []
 
         sample_info =  pd.read_csv(os.path.join(pbm_data_dir, 'description.tsv'), sep='\t')
@@ -44,7 +43,6 @@ class PBM:
             # print(df2.shape)
             df2['filename'] = f
             df2['description'] = sample_info[f.split('_')[0]]
-            df2.append(df)
             df.append(df2)
 
         df = pd.concat(df)
