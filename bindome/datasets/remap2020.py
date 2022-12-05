@@ -14,7 +14,6 @@ def get_parent_path(p):
 class REMAP2020:
     @staticmethod
     def get_remap_peaks(tf, genome="hg19", check=True, summit_extend=100, remove_non_canonical_chromosomes=True):
-
         if genome != "hg19":
             assert genome == "hg19"
         else:
@@ -225,7 +224,7 @@ class REMAP2020:
     def get_remap_peaks_path(tf_name):
         # tf_id = tf_name.lower()
 
-        basedir = join(bd.constants.ANNOTATIONS_DIRECTORY, "remap/remap3/nrPeaks")
+        basedir = join(bd.constants.ANNOTATIONS_DIRECTORY, "epigenomes/remap/remap3/nrPeaks")
 
         if not exists(basedir):
             print("please include this data directory to run loading of peaks successfully")
@@ -237,7 +236,7 @@ class REMAP2020:
         if "remap2" in basedir:
             p = join(basedir, tf_name + ".tsv.gz")
 
-        # print(exists(p), p)
+        print(exists(p), p)
         if not exists(p):
             if not exists(p):
                 # print tf_name, 'not found in REMAP2'

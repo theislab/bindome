@@ -1,5 +1,5 @@
 def pytest_addoption(parser):
-    parser.addoption("--annpath", action="store", default="default name")
+    parser.addoption("--annpath", action="store", default="annotations")
 
 
 def pytest_generate_tests(metafunc):

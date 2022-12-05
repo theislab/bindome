@@ -1,9 +1,9 @@
 import pandas as pd
-import pybedtools
-from pybedtools import BedTool
-
 
 def get_overlapping_peaks(df1, df2):
+    import pybedtools
+    from pybedtools import BedTool
+
     a = df1.copy()
     a = a[["chr", "start", "end", "coordinate"]]
     a.columns = ["chr", "start", "end", "k"]

@@ -26,6 +26,31 @@ class PBM:
         return ad
 
     @staticmethod
+    def pbm_paralogs():
+        pbm_data_dir = os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, 'pbm', 'GSE97794')
+        print(pbm_data_dir)
+        df = []
+
+        sample_info =  pd.read_csv(os.path.join(pbm_data_dir, 'description.tsv'), sep='\t')
+
+        # print(sample_info.head())
+        sample_info = sample_info.set_index('sample')['description'].to_dict()
+
+        for f in os.listdir(pbm_data_dir):
+            if f == 'description.tsv' or '8mers' in f:
+                continue
+
+            df2 = pd.read_csv(os.path.join(pbm_data_dir, f))
+            # print(df2.shape)
+            df2['filename'] = f
+            df2['description'] = sample_info[f.split('_')[0]]
+            df2.append(df)
+            df.append(df2)
+
+        df = pd.concat(df)
+        return df
+
+    @staticmethod
     def pbm_homeo_affreg():
 
         matlab_path = os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, "pbm", "affreg", "PbmDataHom6_norm.mat")

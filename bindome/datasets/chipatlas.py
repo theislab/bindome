@@ -152,19 +152,19 @@ class ChIPAtlas:
         """
         generic data downloading function for retrieving URLs paths from chip_atlas into a local annotations directory
         (BigWig and BED)
-        
+
         Parameters:
         genome: the genome assembly (e.g. hg19, hg38, mm10)
         experiment_id: chip-atlas experiment ID
         datadir: custom directory to download, if provided. Default: None, and hence bindome annotations' directory is used.
         peaks_thr: for bed files, the p-value threshold is indicated (5, 10, or 15)
         data_code: format for files (BigWig = 'bw', BED = 'bed')
-  
+
         Returns:
         str: Path of file downloaded into local directories.
         """
-        
-        
+
+
         ### bed files have a thr parameter. Bw and others do not have this
         if peaks_thr not in {10, 20, 5}:
             print(peaks_thr, "not valid as a peaks_thr...")
@@ -179,33 +179,33 @@ class ChIPAtlas:
         bkp_path = os.path.join(
             datadir, experiment_id + (('.' + str(peaks_thr)) if data_code == 'bed' else '') + (".%s" % data_code)
         )
-        
+
         print(os.path.exists(bkp_path), bkp_path)
         if os.path.exists(bkp_path):
             print('path exists....skip')
             return bkp_path
-        
-        
+
+
         url = "http://dbarchive.biosciencedbc.jp/kyushu-u/%s/eachData/%s%s/%s.%s%s" % (
             genome,
             data_code,
             peaks_thr,
             experiment_id,
-            peaks_thr + ('.' if data_code is not 'bw' else ''),
+            peaks_thr + ('.' if data_code != 'bw' else ''),
             data_code # + ('.gz' if data_code == 'bed' else '')
         )
-        
+
         print("downloading from ChIP-atlas")
         print(url)
-        
+
         # assert False
         print('output path')
         print(bkp_path)
-        
+
         filename = wget.download(url, out=bkp_path)
         return bkp_path
-    
-    
+
+
     @staticmethod
     def get_peaks(genome, experiment_id, datadir=None, peaks_thr=5):
         if peaks_thr not in {10, 20, 5}:
