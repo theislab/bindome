@@ -19,6 +19,8 @@ class SELEX:
             print(accession_id)
             if accession is not None and accession_id != accession:
                 continue
+            if 'ignore' in accession_id:
+                continue
             filenames = [f for f in os.listdir(os.path.join(selex_dir, accession_id))]
             tfs = {f.split("_")[0].upper() for f in filenames}.union(tfs)
             # len(tfs)
@@ -55,17 +57,20 @@ class SELEX:
             assert len(library) == data.shape[0]
             data["library"] = library
 
-            opt_batch = (
-                2
-                if accession_id == "PRJEB3289"
-                else (1 if accession_id == "PRJEB9797" else 1 if accession_id == "PRJEB14744" else 2)
-            )
+            opt_batch = {'PRJEB3289': 2,
+                         'PRJEB9797': 1,
+                         'PRJEB14744': 1,
+                         'cardiac_complexes': 3}
+            opt_batch = opt_batch.get(accession_id, 2)
+
             data["batch"] = data["filename"].str.split(".").str[0].str.split("_").str[opt_batch]
-            opt_cycle = (
-                -1
-                if accession_id == "PRJEB3289"
-                else (2 if accession_id == "PRJEB9797" else 1 if accession_id == "PRJEB14744" else 2)
-            )
+
+            opt_cycle = {'PRJEB3289': -1,
+                         'PRJEB9797': 2,
+                         'PRJEB14744': 1,
+                         'cardiac_complexes': 1}
+            opt_cycle = opt_cycle.get(accession_id, 2)
+
             data["cycle"] = np.where(
                 data["filename"].str.contains("Zero"),
                 0,
@@ -74,7 +79,6 @@ class SELEX:
             data["tf_name"] = [f.split("_")[0].upper() for f in filenames]
             data["accession"] = accession_id
             data_df.append(data)
-        # data.head()
 
         df = pd.concat(data_df).reset_index(drop=True)
         df = df[~df["filename"].str.endswith(".xlsx")].reset_index(drop=True)

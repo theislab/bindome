@@ -20,8 +20,10 @@ class PBM:
     def uniprobe():
         h5ad_path = os.path.join(bd.constants.ANNOTATIONS_DIRECTORY, "pbm", "uniprobe", "All_deBruijn.h5ad")
         if not os.path.exists(h5ad_path):
-            print(h5ad_path)
-            assert os.path.exists(h5ad_path)
+            print('The H5AD from uniprobe is not found. Expected path: %s' % h5ad_path)
+            print('Returning None')
+            return None
+            # assert os.path.exists(h5ad_path)
         ad = anndata.read_h5ad(h5ad_path)
         return ad
 
@@ -39,7 +41,7 @@ class PBM:
             if f == 'description.tsv' or '8mers' in f:
                 continue
 
-            df2 = pd.read_csv(os.path.join(pbm_data_dir, f))
+            df2 = pd.read_csv(os.path.join(pbm_data_dir, f), sep='\t')
             # print(df2.shape)
             df2['filename'] = f
             df2['description'] = sample_info[f.split('_')[0]]
