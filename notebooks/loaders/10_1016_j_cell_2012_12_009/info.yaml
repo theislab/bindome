@@ -1,0 +1,7 @@
+author: 'Jolma'
+doi_journal: '10.1016/j.cell.2012.12.009'
+year: 2013
+organism: 'homo sapiens'
+acc_ids: ['PRJEB3291', 'PRJEB3289']
+download_meta_url: ['https://www.ebi.ac.uk/ena/portal/api/filereport?accession=',
+  '&result=read_run&fields=study_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,fastq_ftp,submitted_ftp,sra_ftp&format=tsv&download=true&limit=0']
