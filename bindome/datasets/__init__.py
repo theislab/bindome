@@ -6,3 +6,5 @@ from bindome.datasets.remap import REMAP
 from bindome.datasets.remap2020 import REMAP2020
 from bindome.datasets.scatac import scATAC
 from bindome.datasets.selex import SELEX
+from bindome.datasets.loader import Loader
+from bindome.datasets.loader import FASTQLoader
